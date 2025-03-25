@@ -4,10 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Tetris</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <canvas id="gameCanvas"></canvas>
+    <!-- Contenedor para el juego -->
+    <div id="game-container">
+      <canvas id="gameCanvas"></canvas>
+      <!-- Contenedor para los datos del HUD (temporizador y puntuación) -->
+      <div id="hud-container">
+        <div id="timer-container">
+          <span>Timer: </span><span id="timer">00:00</span>
+        </div>
+        
+        <div id="score-container">
+          <span>Score: </span><span id="score">0</span>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -42,6 +42,8 @@ const pieceColors = [
   'red', 'green', 'blue', 'yellow', 'orange', 'purple', 'cyan'
 ]
 
+let timer = 0 // El temporizador comienza en 0
+let timerInterval // Variable para almacenar el intervalo del temporizador
 let currentPiece = generateRandomPiece() // Generar una pieza aleatoria al principio
 let currentColor = generateRandomColor() // Asignar un color aleatorio a la pieza
 let currentX = 5 // Posición inicial de la pieza en el eje X
@@ -261,8 +263,32 @@ function resizeCanvas () {
   drawPiece(currentPiece, currentX, currentY)
 }
 
+// Función para empezar el temporizador
+function startTimer () {
+  timerInterval = setInterval(() => {
+    timer++ // Incrementar el tiempo
+    updateTimerDisplay() // Actualizar la visualización
+  }, 1000) // El temporizador se actualiza cada segundo
+}
+
+// Función para detener el temporizador
+function stopTimer () {
+  clearInterval(timerInterval)
+}
+
+// Función para actualizar el temporizador en el HTML
+function updateTimerDisplay () {
+  const timerElement = document.getElementById('timer')
+  const minutes = Math.floor(timer / 60) // Calcular los minutos
+  const seconds = timer % 60 // Calcular los segundos
+  timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
 // Inicialización
 initializeBoard()
+
+// Iniciar el temporizador cuando el juego comience
+startTimer()
 
 // Ajustar el tamaño al inicio y cuando se redimensione la ventana
 window.addEventListener('resize', resizeCanvas)
