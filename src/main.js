@@ -42,13 +42,20 @@ const pieceColors = [
   'red', 'green', 'blue', 'yellow', 'orange', 'purple', 'cyan'
 ]
 
-let timer = 0 // El temporizador comienza en 0
-let timerInterval // Variable para almacenar el intervalo del temporizador
 let currentPiece = generateRandomPiece() // Generar una pieza aleatoria al principio
 let currentColor = generateRandomColor() // Asignar un color aleatorio a la pieza
 let currentX = 5 // Posición inicial de la pieza en el eje X
 let currentY = 0 // Posición inicial de la pieza en el eje Y
 const board = [] // Tablero vacío
+
+const timer = 0 // El temporizador comienza en 0
+let timerInterval // Variable para almacenar el intervalo del temporizador
+
+let score = 0 // Inicializar el score en 0
+let gameSeconds = 0 // Segundos jugados
+let gameMinutes = 0 // Minutos jugados
+let lineBasePoints = 10 // Puntos base por eliminar una línea
+let timeScoreIncrement = 1 // Incremento inicial de puntuación por segundo
 
 // Inicializar el tablero
 function initializeBoard () {
@@ -180,15 +187,20 @@ function placePiece (shape) {
   drawBoard()
 }
 
-// Función para eliminar las líneas completas
 function clearFullLines () {
-  for (let r = 0; r < rows; r++) {
-    // Verificar si la fila está completa
+  let linesCleared = 0
+  for (let r = rows - 1; r >= 0; r--) {
     if (board[r].every(cell => cell !== 0)) {
-      // Si la fila está completa, la eliminamos y movemos las piezas hacia abajo
-      board.splice(r, 1) // Eliminar la fila
-      board.unshift(Array(cols).fill(0)) // Insertar una nueva fila vacía en la parte superior
+      board.splice(r, 1) // Elimina la línea completa
+      board.unshift(Array(cols).fill(0)) // Agrega una nueva línea vacía arriba
+      linesCleared++
+      r++ // Vuelve a verificar la misma fila después del desplazamiento
     }
+  }
+
+  if (linesCleared > 0) {
+    score += 10 * Math.pow(2, linesCleared - 1) // Usa potencias en lugar de multiplicación lineal
+    updateScoreDisplay()
   }
 }
 
@@ -266,8 +278,18 @@ function resizeCanvas () {
 // Función para empezar el temporizador
 function startTimer () {
   timerInterval = setInterval(() => {
-    timer++ // Incrementar el tiempo
-    updateTimerDisplay() // Actualizar la visualización
+    gameSeconds++
+    score += timeScoreIncrement // Suma puntos por tiempo
+
+    if (gameSeconds % 60 === 0) {
+      gameMinutes++
+      lineBasePoints *= 2 // Duplica el valor base de eliminar una línea
+      timeScoreIncrement++ // Aumenta la puntuación por segundo
+    }
+
+    // Actualiza el temporizador y la puntuación en el HTML
+    updateTimerDisplay()
+    updateScoreDisplay()
   }, 1000) // El temporizador se actualiza cada segundo
 }
 
@@ -279,15 +301,20 @@ function stopTimer () {
 // Función para actualizar el temporizador en el HTML
 function updateTimerDisplay () {
   const timerElement = document.getElementById('timer')
-  const minutes = Math.floor(timer / 60) // Calcular los minutos
-  const seconds = timer % 60 // Calcular los segundos
+  const minutes = Math.floor(gameSeconds / 60)
+  const seconds = gameSeconds % 60
   timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+function updateScoreDisplay () {
+  const scoreElement = document.getElementById('score')
+  scoreElement.textContent = score
 }
 
 // Inicialización
 initializeBoard()
 
-// Iniciar el temporizador cuando el juego comience
+// Iniciar el temporizador y el score cuando el juego comience
 startTimer()
 
 // Ajustar el tamaño al inicio y cuando se redimensione la ventana
